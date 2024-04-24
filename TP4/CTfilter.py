@@ -18,4 +18,4 @@ def filterSinogram(sinogram):
 def filterLine(projection):
 
     # votre code ici
-    # un filtre rampe est suffisant    
+    # un filtre rampe est suffisant

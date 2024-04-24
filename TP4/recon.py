@@ -30,7 +30,7 @@ def readInput():
         print("angles file and sinogram file conflict, aborting!")
         exit(0)
 
-    if geo.nbpix != nbpix2:
+    if geo.nbpxi != nbpix2:
         print("geo description and sinogram file conflict, aborting!")
         exit(0)
 
@@ -48,10 +48,28 @@ def laminogram():
     # "etaler" les projections sur l'image
     # ceci sera fait de façon "voxel-driven"
     # pour chaque voxel, trouver la contribution du signal reçu
+    mill = round(geo.nbvox/2)
     for j in range(geo.nbvox): # colonnes de l'image
         print("working on image column: "+str(j+1)+"/"+str(geo.nbvox))
         for i in range(geo.nbvox): # lignes de l'image
             for a in range(len(angles)):
+                angle = angles[i]
+                if 0 < angle < np.pi/2:
+                    ratio = np.cos(angle)
+
+                if np.pi/2 < angle < np.pi:
+                    ratio = np.cos(np.pi-angle)
+
+                if np.pi < angle < 3*np.pi/2:
+                    ratio = np.cos(3*np.pi/2-angle)
+
+                if 3*np.pi/2 < angle < 2*np.pi:
+                    ratio = np.cos(2*np.pi - angle)
+                                  
+                posix = (mill-i)
+
+
+
                 #votre code ici...
                 #le défi est simplement géométrique;
                 #pour chaque voxel, trouver la position par rapport au centre de la
@@ -61,10 +79,7 @@ def laminogram():
                 #le pixel le plus proche ou interpoler linéairement...Rappel, le centre
                 #du détecteur est toujours aligné avec le centre de la grille de
                 #reconstruction peu importe l'angle.
-                
-                
-                
-                
+                        
     util.saveImage(image, "lam")
 
 

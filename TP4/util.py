@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# TP reconstruction TDM (CT)
-# Prof: Philippe Després
-# programme: Dmitri Matenine (dmitri.matenine.1@ulaval.ca)
-
-
 #libs
 import numpy as np
 import matplotlib.pyplot as plt
