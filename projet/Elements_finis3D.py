@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 
-def Éléments_fini3D(T, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur):
+def Éléments_fini3D_temporel(T, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur):
     for k in range(0, temps_iter-1, 1):   #range(start, stop, step)
         for d in range(1, largeur-1, delta_x):
             for l in range(1, longueur-1, delta_x):

@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import gridspec
-from Elements_finis3D import Éléments_fini3D
-from conditions_initial import T_init_cubiques_tridimension, hiver
-from Gauss_Siedel import Gauss_Siedel_surrelax
+from Elements_finis3D import Éléments_fini3D_temporel
+from conditions_initial import T_init_cubiques_tridimension
+from Gauss_Seidel import Gauss_Seidel_temporel
 
 #Dimensions de la maison, [dm]
 largeur = 100
@@ -78,7 +78,7 @@ def animate(k):
 
 ######Éléments fini cubiques
 T = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur) # Provenant du module conditions_initiales
-T = Éléments_fini3D(T, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur)
+T = Éléments_fini3D_temporel(T, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur)
 
 y_plan = int(longueur/2)
 
@@ -100,7 +100,7 @@ plt.show()
 
 #######Gauss Siegel Cubique
 T = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur) # Provenant du module conditions_initiales
-T = Gauss_Siedel_surrelax(T, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur)
+T = Gauss_Seidel_temporel(T, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur)
 kw = {
     'vmin': T.min(),
     'vmax': T.max(),
