@@ -48,28 +48,27 @@ def laminogram():
     # "etaler" les projections sur l'image
     # ceci sera fait de façon "voxel-driven"
     # pour chaque voxel, trouver la contribution du signal reçu
-    mill = round(geo.nbvox/2)
+    center_x = geo.nbvox / 2
+    center_y = geo.nbvox / 2
     for j in range(geo.nbvox): # colonnes de l'image
         print("working on image column: "+str(j+1)+"/"+str(geo.nbvox))
         for i in range(geo.nbvox): # lignes de l'image
+
             for a in range(len(angles)):
-                angle = angles[i]
-                if 0 < angle < np.pi/2:
-                    ratio = np.cos(angle)
+                theta = angles[i]
+                R = np.array([[np.cos(theta), -np.sin(theta)],
+                            [np.sin(theta), np.cos(theta)]])
+                x = j - center_x * geo.voxsize
+                y = center_y - i * geo.voxsize
+                posi = np.array([[x],
+                            [y]])
+                distance = np.sqrt(x**2 + y**2)
 
-                if np.pi/2 < angle < np.pi:
-                    ratio = np.cos(np.pi-angle)
+                posi_prime = np.matmul(R, posi)
+                val_xsino = round(posi_prime[0]/geo.pixsize)
+                image [i, j].append(sinogram[a, center_x+val_xsino])
 
-                if np.pi < angle < 3*np.pi/2:
-                    ratio = np.cos(3*np.pi/2-angle)
-
-                if 3*np.pi/2 < angle < 2*np.pi:
-                    ratio = np.cos(2*np.pi - angle)
-                                  
-                posix = (mill-i)
-
-
-
+                                
                 #votre code ici...
                 #le défi est simplement géométrique;
                 #pour chaque voxel, trouver la position par rapport au centre de la
