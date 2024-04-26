@@ -24,7 +24,7 @@ x, y, z = np.meshgrid(np.arange(1, largeur-1), np.arange(1, longueur-1), np.aran
 
 
 
-def plotheatmap(T_k, k):
+def plotheatmap(k):
     plt.clf()   #clear figure pour en refaire 
     
     plt.title(f"Température à t = {k*delta_t:.2f} s")
@@ -78,6 +78,7 @@ def animate(k):
 
 ######Éléments fini cubiques
 T = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur) # Provenant du module conditions_initiales
+print(T)
 T = Éléments_fini3D_temporel(T, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur)
 
 y_plan = int(longueur/2)
