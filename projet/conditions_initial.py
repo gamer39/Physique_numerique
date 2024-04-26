@@ -1,5 +1,8 @@
 import  numpy as np
 import time
+
+
+
 def températures_ext(largeur, saison):
     '''
     saison: str, 'été' ou 'hiver'
@@ -25,9 +28,8 @@ def T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur
 
     T_haut, T_bas, T_gauche, T_droite, T_avant, T_arrière = températures_ext(largeur, saison)
 
-        #Initialisation de la matrice T(k, i, j)
     #Initialisation de la matrice T(k, d, l, h)
-    T = np.empty((temps_iter, largeur, longueur, hauteur))
+    T = np.zeros((temps_iter, largeur, longueur, hauteur))
 
     #Initialisation des conditions internes
     T_initial = 273+20
@@ -47,16 +49,18 @@ def T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur
     #Limites intérieures des murs
     T[:, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur] = 273+20
 
-    #Créer une matrice 3D sans le temps, pour itérer en boucle while
-    A = np.empty((largeur, longueur, hauteur))
-    A.fill(273+20)
-    A[ :1, :, :] = T_gauche
-    A[ (largeur-1):, :, :] = T_droite
+    return T
 
-    A[ :, :1, :] = T_avant
-    A[ :, (longueur-1):, :] = T_avant
+#Dimensions de la maison, [dm]
+largeur = 100
+longueur = 100
+hauteur = 100
+largeur_mur = 50
+#Variables
+temps_iter = 10
+alpha = 22.5*1e-6 #du cahier de transfert thermique, à 300 K = 27 C, [m²/s] p.61
+delta_x = 1
+delta_t = (delta_x**2)/(6*alpha)    #Pour la stabilité, delta_t <= delta**2/2*alpha
 
-    A[ : , :, (hauteur-1):] = T_haut
-    A[ :, :, :1] = T_bas
-    return T, A
-    
+T_init_cube_h = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, "hiver")
+T_init_cube_e = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, "été")

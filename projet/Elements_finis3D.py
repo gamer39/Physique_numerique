@@ -18,9 +18,9 @@ def Éléments_fini3D_temporel(T, largeur, longueur, hauteur, temps_iter, alpha,
 
 
 
-def Éléments_fini3D_convergence(A, B, précision,largeur, longueur, hauteur, alpha, delta_t, delta_x):
+def Éléments_fini3D_convergence(T, B, précision,largeur, longueur, hauteur, alpha, delta_t, delta_x):
     delta_matrix = 1
-
+    A = T[0, :, :, :]
     k = 0
     start = time.perf_counter()
     while delta_matrix >= précision:
