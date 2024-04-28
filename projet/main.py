@@ -59,31 +59,37 @@ def plotheatmap(T_k, k):
 def animate_cart(k):
     plotheatmap(T_celsius[k], k)
 
+        
+#CARTÉSIEN
+#Dimensions de la maison, [dm]
+largeur = 50
+longueur = 50
+hauteur = 50
+largeur_mur = 5
+#Variables
+temps_iter = 5
+facteur_dimension = 10 #si on a des dm, il y a 10 dm dans 1 m
+alpha = 0.54*1e-6*facteur_dimension**2 #du cahier de transfert thermique, à 300 K = 27 C, [m²/s] p.61
+delta_x = 1
+delta_t = (delta_x**2)/(6*alpha)    #Pour la stabilité, delta_t <= delta**2/2*alpha
+y_plan = int(longueur/2)
+
+#Créer l'espace 3D
+X, Y, Z = np.meshgrid(np.arange(largeur), np.arange(longueur), np.arange(hauteur))
+x, y, z = np.meshgrid(np.arange(1, largeur-1), np.arange(1, longueur-1), np.arange(1, hauteur-1))
+
 
 
 if input("Voulez-vous une simulation cartésienne? [ Oui/ Non] ") == "oui" or input("Voulez-vous une simulation cartésienne? [ Oui/ Non] ") == "oui":
-
-    #CARTÉSIEN
-    #Dimensions de la maison, [dm]
-    largeur = 50
-    longueur = 50
-    hauteur = 50
-    largeur_mur = 5
-    #Variables
-    temps_iter = 20
-    facteur_dimension = 10 #si on a des dm, il y a 10 dm dans 1 m
-    alpha = 0.54*1e-6*facteur_dimension**2 #du cahier de transfert thermique, à 300 K = 27 C, [m²/s] p.61
-    delta_x = 1
-    delta_t = (delta_x**2)/(6*alpha)    #Pour la stabilité, delta_t <= delta**2/2*alpha
-    y_plan = int(longueur/2)
-
-    #Créer l'espace 3D
-    X, Y, Z = np.meshgrid(np.arange(largeur), np.arange(longueur), np.arange(hauteur))
-    x, y, z = np.meshgrid(np.arange(1, largeur-1), np.arange(1, longueur-1), np.arange(1, hauteur-1))
-
+    if input("Quelle saison? [H/E] ") == "H" or "h":
+        T_elements, T_3D = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, facteur_dimension, 'hiver')
+        var_saison = "hiver"
+    else:
+        var_saison = "été"
+        T_elements, T_3D = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, facteur_dimension, 'été')
 
     ######FTCS ESPACE 3D CUBIQUE
-    T_elements, T_3D = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, facteur_dimension, 'hiver') # Provenant du module conditions_initiales
+     # Provenant du module conditions_initiales
     T, temps_cart = FTCS_temporel(T_elements, largeur, longueur, hauteur, temps_iter, alpha, delta_x, delta_t, largeur_mur)
     T_celsius = T - 273
     print('CARTÉSIEN, temps =', temps_cart, 's')
@@ -96,9 +102,9 @@ if input("Voulez-vous une simulation cartésienne? [ Oui/ Non] ") == "oui" or in
 
     fig = plt.figure(figsize=(10,15))
 
-    anim = animation.FuncAnimation(fig, animate_cart, interval=1, frames=temps_iter, repeat=True)
+    anim = animation.FuncAnimation(fig, animate_cart, interval=1, frames=temps_iter, repeat=False) #J'ai mis false ici sinon même en fermant la fenetre le reste du code ne roule pas
     # Show Figure
-    #anim.save('/home/alicecalice/Documents/Physique numérique/Conduction_3D_et_2D_dm_50x50x50_hiver.gif')
+    anim.save(f'projet/Conduction_3D_et_2D_dm_50x50x50_{var_saison}.gif')
 
     plt.show()
 
@@ -138,17 +144,22 @@ largeur_mur = 5
 delta_r = 1
 
 if input("Voulez-vous une simulation cylindrique? [ Oui/ Non] ") == "oui" or input("Voulez-vous une simulation cylindrique? [ Oui/ Non] ") == "oui":
+    if input("Quelle saison? [H/E] ") == "H" or "h":
+        T_cyl_elements = T_init_cyl(temps_iter, longueur_r, hauteur, largeur_mur, facteur_dimension, 'hiver')
+        var_saison = "hiver"
+    else:
+        T_cyl_elements = T_init_cyl(temps_iter, longueur_r, hauteur, largeur_mur, facteur_dimension, 'été')
+        var_saison ="été"
 
-    T_cyl_elements = T_init_cyl(temps_iter, longueur_r, hauteur, largeur_mur, facteur_dimension, 'hiver')
     T_cyl, temps = FTCS_temporel_cyl(T_cyl_elements, longueur_r, hauteur, temps_iter, alpha, delta_r, delta_t, largeur_mur)
     T_cyl_celsius = T_cyl - 273
     # print('CYLINDRIQUE, temps : ', round(temps, 2), ' s')
 
     fig_cyl = plt.figure(figsize=(10,10))
 
-    anim = animation.FuncAnimation(fig_cyl, animate_cyl, interval=1, frames=temps_iter, repeat=True)
+    anim = animation.FuncAnimation(fig_cyl, animate_cyl, interval=1, frames=temps_iter, repeat=False) #J'ai mis false ici sinon même en fermant la fenetre le reste du code ne roule pas
     # # Show Figure
-    #anim.save('/home/alicecalice/Documents/Physique numérique/Conduction_cyl_28x50_hiver.gif')
+    anim.save(f'projet/Conduction_cylindrique_{var_saison}.gif')
 
     plt.show()
 
