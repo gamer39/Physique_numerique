@@ -40,19 +40,19 @@ def T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur
     T = np.zeros((temps_iter, largeur, longueur, hauteur))
 
     #Initialisation des conditions internes
-    T_initial = (min(gradient)+max(gradient))/2
+    T_initial = 293  #20C
     T.fill(T_initial)
 
     #Commence à 1m sous terre
     #Températures de la couche de terre autour
-    T[:, :1, :, :] = T_gauche
-    T[:, (largeur-1):, :, :] = T_droite
+    T[:, :largeur_mur, :, :] = T_gauche
+    T[:, (largeur-largeur_mur):, :, :] = T_droite
 
-    T[:, :, :1, :] = T_avant
-    T[:, :, (longueur-1):, :] = T_arrière
+    T[:, :, :largeur_mur, :] = T_avant
+    T[:, :, (longueur-largeur_mur):, :] = T_arrière
 
-    T[:, : , :, (hauteur-1):] = T_haut
-    T[:, :, :, :1] = T_bas
+    T[:, : , :, (hauteur-largeur_mur):] = T_haut
+    T[:, :, :, :largeur_mur] = T_bas
 
     #Limites intérieures des murs
     T[:, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur] = 293
