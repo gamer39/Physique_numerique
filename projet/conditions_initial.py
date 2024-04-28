@@ -3,36 +3,44 @@ import time
 
 
 
-def températures_ext(largeur, saison):
+
+def températures_ext(largeur, facteur_dimension, saison):
     '''
     saison: str, 'été' ou 'hiver'
     '''
     #Commence à 1m sous terre
-    T_haut = 273
-    T_bas = 273+8
+    gradient = []
     if saison == 'hiver':
-        gradient = [-3, 0, 4, 6, 7, 7.5, 8]
+        grad = [-3, 0, 4, 6, 7, 7.5, 8]
     elif saison == 'été':
-        gradient = [22, 16, 13, 11, 10, 9, 8]
+        grad = [22, 16, 13, 11, 10, 9, 8]
+    
+    gradient = []
+    for i in range(len(grad)-1):
+        gradient += list(np.linspace(grad[i], grad[i+1], facteur_dimension))
+  
     for i in range(largeur-len(gradient)):
         gradient.append(8)
-    T_gauche = [273+g for g in list(reversed(gradient))]
-    T_droite = [273+g for g in list(reversed(gradient))]
-    T_avant = [273+g for g in list(reversed(gradient))]
-    T_arrière = [273+g for g in list(reversed(gradient))]
-    return(T_haut, T_bas, T_gauche, T_droite, T_avant, T_arrière)
+    gradient = [g+273 for g in gradient]
+    return gradient[:largeur]
 
 
 
-def T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, saison):
+def T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, facteur_dimension, saison):
 
-    T_haut, T_bas, T_gauche, T_droite, T_avant, T_arrière = températures_ext(largeur, saison)
+    gradient = températures_ext(largeur, facteur_dimension, saison)
+    T_haut = gradient[0]
+    T_bas = gradient[-1] 
+    T_gauche = list(reversed(gradient))
+    T_droite = list(reversed(gradient))
+    T_avant = list(reversed(gradient))
+    T_arrière = list(reversed(gradient))
 
     #Initialisation de la matrice T(k, d, l, h)
     T = np.zeros((temps_iter, largeur, longueur, hauteur))
 
     #Initialisation des conditions internes
-    T_initial = 273+20
+    T_initial = (min(gradient)+max(gradient))/2
     T.fill(T_initial)
 
     #Commence à 1m sous terre
@@ -47,20 +55,42 @@ def T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur
     T[:, :, :, :1] = T_bas
 
     #Limites intérieures des murs
-    T[:, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur] = 273+20
+    T[:, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur] = 293
 
-    return T
+    T_3D = np.zeros((largeur, longueur, hauteur))
+    T_3D.fill(T_initial)
 
-#Dimensions de la maison, [dm]
-largeur = 100
-longueur = 100
-hauteur = 100
-largeur_mur = 50
-#Variables
-temps_iter = 10
-alpha = 22.5*1e-6 #du cahier de transfert thermique, à 300 K = 27 C, [m²/s] p.61
-delta_x = 1
-delta_t = (delta_x**2)/(6*alpha)    #Pour la stabilité, delta_t <= delta**2/2*alpha
+    T_3D[ :1, :, :] = T_gauche
+    T_3D[(largeur-1):, :, :] = T_droite
 
-T_init_cube_h = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, "hiver")
-T_init_cube_e = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, "été")
+    T_3D[ :, :1, :] = T_avant
+    T_3D[ :, (longueur-1):, :] = T_arrière
+
+    T_3D[ : , :, (hauteur-1):] = T_haut
+    T_3D[ :, :, :1] = T_bas
+    
+    T_3D[largeur_mur:-largeur_mur, largeur_mur:-largeur_mur, largeur_mur:-largeur_mur] = 293
+    return T, T_3D
+
+def T_init_cyl(temps_iter, longueur_r, hauteur, largeur_mur, facteur_dimension, saison):
+    gradient = températures_ext(hauteur, facteur_dimension, saison)
+    T_cyl_haut = gradient[0] 
+    T_cyl_bas = gradient[-1] 
+    T_cyl_ext = list(reversed(gradient))
+
+    #Initialisation de la matrice T_cyl(k, i, h, j): temps, rayon, hauteur, orientation
+    T_cyl = np.zeros((temps_iter, 2*longueur_r, hauteur))
+
+    #Initialisation des conditions internes
+    T_initial = gradient[0]
+    T_cyl.fill(T_initial)
+
+    #Limites extérieures
+    T_cyl[:, (2*longueur_r-1):, :] = T_cyl_ext
+    T_cyl[:, :1, :] = T_cyl_ext
+    T_cyl[:, :, :1] = T_cyl_bas
+    T_cyl[:, :, (hauteur-1):] = T_cyl_haut
+    #Limite intérieure
+    T_cyl[:, largeur_mur:-largeur_mur,largeur_mur:-largeur_mur] = 273+20
+    return T_cyl
+
