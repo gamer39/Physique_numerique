@@ -79,8 +79,8 @@ X, Y, Z = np.meshgrid(np.arange(largeur), np.arange(longueur), np.arange(hauteur
 x, y, z = np.meshgrid(np.arange(1, largeur-1), np.arange(1, longueur-1), np.arange(1, hauteur-1))
 
 
-
-if input("Voulez-vous une simulation cartésienne? [ Oui/ Non] ") == "oui" or input("Voulez-vous une simulation cartésienne? [ Oui/ Non] ") == "oui":
+val = input("Voulez-vous une simulation cartésienne? [ Oui/ Non] ")
+if val == "Oui" or val == "OUI" or val == "oui":
     if input("Quelle saison? [H/E] ") == "H" or "h":
         T_elements, T_3D = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, facteur_dimension, 'hiver')
         var_saison = "hiver"
@@ -102,17 +102,16 @@ if input("Voulez-vous une simulation cartésienne? [ Oui/ Non] ") == "oui" or in
 
     fig = plt.figure(figsize=(10,15))
 
-    anim = animation.FuncAnimation(fig, animate_cart, interval=1, frames=temps_iter, repeat=False) #J'ai mis false ici sinon même en fermant la fenetre le reste du code ne roule pas
+    anim = animation.FuncAnimation(fig, animate_cart, interval=1, frames=temps_iter, repeat = False) #J'ai mis false ici sinon même en fermant la fenetre le reste du code ne roule pas
     # Show Figure
     anim.save(f'projet/Conduction_3D_et_2D_dm_50x50x50_{var_saison}.gif')
 
     plt.show()
 
-
-#CYLINDRIQUE
+ #CYLINDRIQUE
 def plotheatmap_cyl(T_k, k):
     plt.clf()   #clear figure pour en refaire 
-    
+        
     plt.title(f"Température à t = {k*delta_t:.0f} s, en coordonnées cylindriques", fontsize=20)
 
     plt.axis('off')
@@ -143,10 +142,12 @@ hauteur = 50
 largeur_mur = 5
 delta_r = 1
 
-if input("Voulez-vous une simulation cylindrique? [ Oui/ Non] ") == "oui" or input("Voulez-vous une simulation cylindrique? [ Oui/ Non] ") == "oui":
+val = input("Voulez-vous une simulation cylindrique? [ Oui/ Non] ")
+if val == "Oui" or val == "OUI" or val == "oui":
+
     if input("Quelle saison? [H/E] ") == "H" or "h":
-        T_cyl_elements = T_init_cyl(temps_iter, longueur_r, hauteur, largeur_mur, facteur_dimension, 'hiver')
-        var_saison = "hiver"
+            T_cyl_elements = T_init_cyl(temps_iter, longueur_r, hauteur, largeur_mur, facteur_dimension, 'hiver')
+            var_saison = "hiver"
     else:
         T_cyl_elements = T_init_cyl(temps_iter, longueur_r, hauteur, largeur_mur, facteur_dimension, 'été')
         var_saison ="été"
@@ -158,24 +159,24 @@ if input("Voulez-vous une simulation cylindrique? [ Oui/ Non] ") == "oui" or inp
     fig_cyl = plt.figure(figsize=(10,10))
 
     anim = animation.FuncAnimation(fig_cyl, animate_cyl, interval=1, frames=temps_iter, repeat=False) #J'ai mis false ici sinon même en fermant la fenetre le reste du code ne roule pas
-    # # Show Figure
+        # # Show Figure
     anim.save(f'projet/Conduction_cylindrique_{var_saison}.gif')
 
     plt.show()
 
-# T_fin = T[-1, :, :, :].copy()
-q_fin = np.subtract(T[-1, :, :, :], T[-2, :, :, :])
-q_fin[largeur_mur:-largeur_mur,largeur_mur:-largeur_mur, largeur_mur:-largeur_mur] = 0
-Q_fin = q_fin[1:largeur-1, 1:longueur-1, 1: hauteur-1]
+    # T_fin = T[-1, :, :, :].copy()
+    q_fin = np.subtract(T[-1, :, :, :], T[-2, :, :, :])
+    q_fin[largeur_mur:-largeur_mur,largeur_mur:-largeur_mur, largeur_mur:-largeur_mur] = 0
+    Q_fin = q_fin[1:largeur-1, 1:longueur-1, 1: hauteur-1]
+    
+    #capacité thermique volumique [kJ/m³K]
+    cap_beton = 2500/facteur_dimension**3
+    cap_laine_verre = 17/facteur_dimension**3
+    q_beton = cap_beton*Q_fin.sum()
+    # q_verre = cap_laine_verre*Q_fin.sum()
+    print('transfert thermique BETON', q_beton, 'kW')
+    # print('transfert thermique LAINE VERRE', q_verre, 'kW')
 
-#capacité thermique volumique [kJ/m³K]
-cap_beton = 2500/facteur_dimension**3
-cap_laine_verre = 17/facteur_dimension**3
-q_beton = cap_beton*Q_fin.sum()
-# q_verre = cap_laine_verre*Q_fin.sum()
-print('transfert thermique BETON', q_beton, 'kW')
-# print('transfert thermique LAINE VERRE', q_verre, 'kW')
 
-
-T_3D_v2 = T_3D.copy()
+    T_3D_v2 = T_3D.copy()
 
