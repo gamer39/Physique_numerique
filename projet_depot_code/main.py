@@ -132,12 +132,13 @@ def transfert_thermique_cyl(matrice_temp, largeur_mur, dim_base, dim_z, facteur_
 
 #CARTÉSIEN
 #Dimensions de la maison, [dm]
-largeur = 117
-longueur = 117
-hauteur = 50
+largeur = 50   # Changer les dimensions pour avoir un temps de calcul plus court
+longueur = 50
+hauteur = 30
 largeur_mur = 5  #donc les murs ont 4 dm de largeur
+
 #Variables
-temps_iter = 70
+temps_iter = 71
 facteur_dimension = 10 #si on a des dm, il y a 10 dm dans 1 m
 alpha = 0.155*1e-6*facteur_dimension**2 #béton: 0.54 m²/s, laine de verre: 0.58 m²/s, liège: 0.115 m²/s
 delta_x = 1
@@ -150,15 +151,17 @@ X, Y, Z = np.meshgrid(np.arange(largeur), np.arange(longueur), np.arange(hauteur
 x, y, z = np.meshgrid(np.arange(1, largeur-1), np.arange(1, longueur-1), np.arange(1, hauteur-1))
 
 #Paramètres cylindriques
-longueur_r = 66 #doit être pair
+longueur_r = 34 #doit être pair
 delta_r = 1
 
 val_cart = input("Voulez-vous une simulation cartésienne? [Oui/ Non] ")
 if val_cart == "Oui" or val_cart == "OUI" or val_cart == "oui":
     val_saison_cart = input("Quelle saison? [H/E] ")
+
     if val_saison_cart == "H" or val_saison_cart == "h":
         T_elements = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, facteur_dimension, 'hiver')
         var_saison = "hiver"
+
     elif val_saison_cart == "E" or val_saison_cart == "e":
         var_saison = "été"
         T_elements = T_init_cubiques_tridimension(temps_iter, largeur, longueur, hauteur, largeur_mur, facteur_dimension, 'été')
@@ -179,7 +182,7 @@ if val_cart == "Oui" or val_cart == "OUI" or val_cart == "oui":
 
     anim = animation.FuncAnimation(fig, animate_cart, interval=1, frames=temps_iter, repeat = False) #J'ai mis false ici sinon même en fermant la fenetre le reste du code ne roule pas
     # Show Figure
-    anim.save(f'/home/alicecalice/Documents/Physique numérique/git2/Conduction_3D_et_2D_VERRE_{var_saison}.gif', fps=2)
+    anim.save(f'projet_depot_code/Conduction_3D_et_2D_VERRE_{var_saison}.gif', fps=2)
 
     plt.show()
 
@@ -209,7 +212,7 @@ if val_cyl == "Oui" or val_cyl == "OUI" or val_cyl == "oui":
 
     anim = animation.FuncAnimation(fig_cyl, animate_cyl, interval=1, frames=temps_iter, repeat=False) #J'ai mis false ici sinon même en fermant la fenetre le reste du code ne roule pas
     #     # # Show Figure
-    anim.save(f'/home/alicecalice/Documents/Physique numérique/git2/Conduction_cylindrique_LIÈGE_{var_saison}.gif', fps=2)
+    anim.save(f'projet_depot_code/Conduction_cylindrique_LIÈGE_{var_saison}.gif', fps=2)
 
     plt.show()
 
